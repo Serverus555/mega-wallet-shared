@@ -4,4 +4,5 @@ generate:
   client: true
   gin-server: true
   strict-server: true
+  embedded-spec: true
 output: gen.go
