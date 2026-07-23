@@ -2,6 +2,8 @@ package cache
 
 import (
 	"time"
+
+	"github.com/maypok86/otter/v2"
 )
 
 type InMemory[K comparable, V any] struct {
