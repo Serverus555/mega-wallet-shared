@@ -1,0 +1,274 @@
+openapi: 3.0.0
+info:
+  title: Wallet API
+  version: 1.0.0
+
+security:
+  - JWTAuth: []
+
+paths:
+  /api/v1/register:
+    post:
+      operationId: register
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterInput'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterOutput'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseError'
+  /api/v1/login:
+    post:
+      operationId: login
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginInput'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginOutput'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseError'
+  /api/v1/balance:
+    get:
+      operationId: get_balance
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BalanceOutput'
+  /api/v1/deposit:
+    post:
+      operationId: deposit
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionInput'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionOutput'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseError'
+  /api/v1/withdraw:
+    post:
+      operationId: withdraw
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionInput'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionOutput'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseError'
+  /api/v1/exchange/rates:
+    get:
+      operationId: get_exchange_rates
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RatesOutput'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseError'
+  /api/v1/exchange:
+    post:
+      operationId: exchange
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExchangeInput'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExchangeOutput'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseError'
+components:
+  securitySchemes:
+    JWTAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    BaseError:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+    RegisterInput:
+      type: object
+      required:
+        - username
+        - password
+        - email
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+        email:
+          type: string
+          format: email
+    RegisterOutput:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+    LoginInput:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+    LoginOutput:
+      type: object
+      required:
+        - token
+      properties:
+        token:
+          type: string
+    BalanceOutput:
+      type: object
+      required:
+        - balance
+      properties:
+        balance:
+          type: object
+          additionalProperties:
+            type: string
+            format: float
+    TransactionInput:
+      type: object
+      required:
+        - amount
+        - currency
+      properties:
+        amount:
+          type: string
+          format: float
+        currency:
+          type: string
+    TransactionOutput:
+      type: object
+      required:
+        - message
+        - new_balance
+      properties:
+        message:
+          type: string
+        new_balance:
+          type: object
+          additionalProperties:
+            type: string
+            format: float
+    RatesOutput:
+      type: object
+      required:
+        - rates
+      properties:
+        rates:
+          type: object
+          additionalProperties:
+            type: string
+            format: float
+    ExchangeInput:
+      type: object
+      required:
+        - from_currency
+        - to_currency
+        - amount
+      properties:
+        from_currency:
+          type: string
+        to_currency:
+          type: string
+        amount:
+          type: string
+          format: float
+    ExchangeOutput:
+      type: object
+      required:
+        - exchange_amount
+        - new_balance
+        - message
+      properties:
+        message:
+          type: string
+        exchange_amount:
+          type: string
+          format: float
+        new_balance:
+          type: object
+          additionalProperties:
+            type: string
+            format: float

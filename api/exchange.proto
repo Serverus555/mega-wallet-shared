@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package exchange;
+
+option go_package = "mega-wallet-shares/proto-exchange/exchange.grpc";
+
+import "google/protobuf/empty.proto";
+
+service ExchangeService {
+  rpc GetExchangeRates(google.protobuf.Empty) returns (ExchangeRatesOutput);
+}
+
+message ExchangeRatesOutput {
+  map<string, string> currencyToRate = 1;
+}
