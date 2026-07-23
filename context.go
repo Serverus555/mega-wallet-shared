@@ -6,12 +6,12 @@ import (
 	"github.com/google/uuid"
 )
 
-type UserIdKey struct{}
+const UserIdKey = "UserId"
 
 func PutUserId(ctx context.Context, userId uuid.UUID) context.Context {
-	return context.WithValue(ctx, UserIdKey{}, userId)
+	return context.WithValue(ctx, UserIdKey, userId)
 }
 
 func GetUserId(ctx context.Context) uuid.UUID {
-	return ctx.Value(UserIdKey{}).(uuid.UUID)
+	return ctx.Value(UserIdKey).(uuid.UUID)
 }
