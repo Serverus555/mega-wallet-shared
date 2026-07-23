@@ -85,6 +85,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BaseError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseError'
   /api/v1/withdraw:
     post:
       operationId: withdraw
@@ -107,6 +113,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BaseError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseError'
   /api/v1/exchange/rates:
     get:
       operationId: get_exchange_rates
@@ -119,6 +131,12 @@ paths:
                 $ref: '#/components/schemas/RatesOutput'
         '400':
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseError'
+        '401':
+          description: Unauthorized
           content:
             application/json:
               schema:
@@ -141,6 +159,12 @@ paths:
                 $ref: '#/components/schemas/ExchangeOutput'
         '400':
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseError'
+        '401':
+          description: Unauthorized
           content:
             application/json:
               schema:
