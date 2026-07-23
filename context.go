@@ -8,8 +8,8 @@ import (
 
 type userIdKey struct{}
 
-func PutUserId(ctx context.Context, userId uuid.UUID) {
-	context.WithValue(ctx, userIdKey{}, userId)
+func PutUserId(ctx context.Context, userId uuid.UUID) context.Context {
+	return context.WithValue(ctx, userIdKey{}, userId)
 }
 
 func GetUserId(ctx context.Context) uuid.UUID {
