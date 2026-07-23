@@ -794,6 +794,8 @@ type DepositResponse struct {
 	JSON200 *TransactionOutput
 	// JSON400 the response for an HTTP 400 `application/json` response
 	JSON400 *BaseError
+	// JSON401 the response for an HTTP 401 `application/json` response
+	JSON401 *BaseError
 }
 
 // GetJSON200 returns the response for an HTTP 200 `application/json` response
@@ -804,6 +806,11 @@ func (r DepositResponse) GetJSON200() *TransactionOutput {
 // GetJSON400 returns the response for an HTTP 400 `application/json` response
 func (r DepositResponse) GetJSON400() *BaseError {
 	return r.JSON400
+}
+
+// GetJSON401 returns the response for an HTTP 401 `application/json` response
+func (r DepositResponse) GetJSON401() *BaseError {
+	return r.JSON401
 }
 
 // GetBody returns the raw response body bytes
@@ -842,6 +849,8 @@ type ExchangeResponse struct {
 	JSON200 *ExchangeOutput
 	// JSON400 the response for an HTTP 400 `application/json` response
 	JSON400 *BaseError
+	// JSON401 the response for an HTTP 401 `application/json` response
+	JSON401 *BaseError
 }
 
 // GetJSON200 returns the response for an HTTP 200 `application/json` response
@@ -852,6 +861,11 @@ func (r ExchangeResponse) GetJSON200() *ExchangeOutput {
 // GetJSON400 returns the response for an HTTP 400 `application/json` response
 func (r ExchangeResponse) GetJSON400() *BaseError {
 	return r.JSON400
+}
+
+// GetJSON401 returns the response for an HTTP 401 `application/json` response
+func (r ExchangeResponse) GetJSON401() *BaseError {
+	return r.JSON401
 }
 
 // GetBody returns the raw response body bytes
@@ -890,6 +904,8 @@ type GetExchangeRatesResponse struct {
 	JSON200 *RatesOutput
 	// JSON400 the response for an HTTP 400 `application/json` response
 	JSON400 *BaseError
+	// JSON401 the response for an HTTP 401 `application/json` response
+	JSON401 *BaseError
 }
 
 // GetJSON200 returns the response for an HTTP 200 `application/json` response
@@ -900,6 +916,11 @@ func (r GetExchangeRatesResponse) GetJSON200() *RatesOutput {
 // GetJSON400 returns the response for an HTTP 400 `application/json` response
 func (r GetExchangeRatesResponse) GetJSON400() *BaseError {
 	return r.JSON400
+}
+
+// GetJSON401 returns the response for an HTTP 401 `application/json` response
+func (r GetExchangeRatesResponse) GetJSON401() *BaseError {
+	return r.JSON401
 }
 
 // GetBody returns the raw response body bytes
@@ -1034,6 +1055,8 @@ type WithdrawResponse struct {
 	JSON200 *TransactionOutput
 	// JSON400 the response for an HTTP 400 `application/json` response
 	JSON400 *BaseError
+	// JSON401 the response for an HTTP 401 `application/json` response
+	JSON401 *BaseError
 }
 
 // GetJSON200 returns the response for an HTTP 200 `application/json` response
@@ -1044,6 +1067,11 @@ func (r WithdrawResponse) GetJSON200() *TransactionOutput {
 // GetJSON400 returns the response for an HTTP 400 `application/json` response
 func (r WithdrawResponse) GetJSON400() *BaseError {
 	return r.JSON400
+}
+
+// GetJSON401 returns the response for an HTTP 401 `application/json` response
+func (r WithdrawResponse) GetJSON401() *BaseError {
+	return r.JSON401
 }
 
 // GetBody returns the raw response body bytes
@@ -1261,6 +1289,13 @@ func ParseDepositResponse(rsp *http.Response) (*DepositResponse, error) {
 		}
 		response.JSON400 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest BaseError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
 	}
 
 	return response, nil
@@ -1294,6 +1329,13 @@ func ParseExchangeResponse(rsp *http.Response) (*ExchangeResponse, error) {
 		}
 		response.JSON400 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest BaseError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
 	}
 
 	return response, nil
@@ -1326,6 +1368,13 @@ func ParseGetExchangeRatesResponse(rsp *http.Response) (*GetExchangeRatesRespons
 			return nil, err
 		}
 		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest BaseError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
 
 	}
 
@@ -1425,6 +1474,13 @@ func ParseWithdrawResponse(rsp *http.Response) (*WithdrawResponse, error) {
 			return nil, err
 		}
 		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest BaseError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
 
 	}
 
@@ -1649,6 +1705,20 @@ func (response Deposit400JSONResponse) VisitDepositResponse(w http.ResponseWrite
 	return err
 }
 
+type Deposit401JSONResponse BaseError
+
+func (response Deposit401JSONResponse) VisitDepositResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 type ExchangeRequestObject struct {
 	Body *ExchangeJSONRequestBody
 }
@@ -1685,6 +1755,20 @@ func (response Exchange400JSONResponse) VisitExchangeResponse(w http.ResponseWri
 	return err
 }
 
+type Exchange401JSONResponse BaseError
+
+func (response Exchange401JSONResponse) VisitExchangeResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 type GetExchangeRatesRequestObject struct {
 }
 
@@ -1716,6 +1800,20 @@ func (response GetExchangeRates400JSONResponse) VisitGetExchangeRatesResponse(w 
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetExchangeRates401JSONResponse BaseError
+
+func (response GetExchangeRates401JSONResponse) VisitGetExchangeRatesResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
 	_, err := buf.WriteTo(w)
 	return err
 }
@@ -1824,6 +1922,20 @@ func (response Withdraw400JSONResponse) VisitWithdrawResponse(w http.ResponseWri
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type Withdraw401JSONResponse BaseError
+
+func (response Withdraw401JSONResponse) VisitWithdrawResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
 	_, err := buf.WriteTo(w)
 	return err
 }
@@ -2118,19 +2230,19 @@ func (sh *strictHandler) Withdraw(ctx *gin.Context) {
 // const string: with thousands of chunks the chained `+` fold is several
 // times slower for the Go compiler than parsing a slice literal.
 var swaggerSpec = []string{
-	"7FZPb9s+DP0qBX+/o1En206+NVs3tBvQouuQQxEUqs0k6mxJo+hmWeHvPsiOnTix0hZI0g3YyYb+kI98",
-	"FPkeIdaZ0QoVW4gewcZTzET5OxCpUDFe5GxydguGtEFiieX2XbXtfkWSSJZaifSydWSsKRMMEYxTLRgC",
-	"4LlBiMAySTWBolnQd/cYMxRFAIQ/ckmYQHTTuBhtHAxgICyeEmnaRIb18pq7NevVsS7bpz/jqVATPFOd",
-	"kYtM54qfF+CYdHYb50So4nkHpgBYb9tfw9w2174c1MC2heRjExf7ty8JLkNrxQQ7w1I4uz1Aiazjbjte",
-	"QuzKyRc9kcrDsRHWzjQlnbHlFkmJDJ/mqzkZLC16ofi4Yf0d1dO+qmNd1q8Eo/VZJ7e5T4oqB524cCIt",
-	"I3k4wEzItIWgWulAsEe6goXXbQH4cut/IGuOt5XpNQllReyo2UFDen6vaV5Uc+UJdC/PwsHaRA2h7XDU",
-	"dc1inJPk+Vc3CSvv58Prk5yn5dRDQUgfazjnw2sIqqHpzFS7S3hTZgOFsyrVWJcJkJy6naFIU+Sjk8sz",
-	"COAByUqtIIL+ce+458LRBpUwEiJ4Wy65guRpiSYURoYP/XAlbRMs0+4yJso6SSCCT8iDpg8SWqOVreJ5",
-	"0+u5T6wVY1U3wphUxuXd8N5qtZQC7u9/wjFE8F+41ArhQiiEbZVQxpqgjUkarkK6+OxWi6DBnaDRVlZ1",
-	"om0H8A+LAxWFaHmgk/nOAG88p6JdLEw5FntM2OaD8SQtgHc75anWSx3uBiI5uqpyvUZWPV/9bNXKYk90",
-	"tbXYgblaU01/A1FhM899TaEOqlQF+2wNq7LjT05d6sSXv8BLbban6l6RoAcu7VXFuYWc/mHI+aZEzlNN",
-	"8hcmrSkM0c1olStaKC4/XbUm2xNjbc36LNL6O3fu5+09oWCXw1d7WX7uZpKnCYmZn7thfeLf6H+tttjm",
-	"b0X73oyKUfE7AAD//w==",
+	"7FdBT9tMEP0raL7vaOGk7ck30tIKWglEqXJAEVrsSbLU3nVnx6Qp8n+v1hs7ceINICXhUE6xdtczb+a9",
+	"Wb88QqyzXCtUbCB6BBNPMRPV40CkQsV4UXBesF3ISedILLHavnPb9lEkiWSplUgvW0fGmjLBEME41YIh",
+	"AJ7nCBEYJqkmUDYL+u4eY4ayDIDwVyEJE4humhSjjYMBDITBUyJNm8iwXl5LtxbdHeuKffo7ngo1wTPV",
+	"WbnIdKH4eQWOSWe3cUGEKp53YAqA9bb9NcztcO2XgxrYtpJ8bOJi//YlxWVojJhgZ1kKZ7cHkMg67nbi",
+	"JcSunnzTE6k8HOfCmJmmpLO2wiApkeHTfDUng2VELxQfN6x/ono6lzvWFf1KMBpfdLKb+6TIJejEhRNp",
+	"GMnDAWZCpi0EbqUDwR7pChZZtxXg661/QNYSb5PpNQllRGyp2cGF9Py7ppmo5pUn0L28Cwe7JmoI7YSj",
+	"rtcMxgVJnn+3X0KX/Xx4fVLwtPrqoSCkzzWc8+E1BO6jacO43SW8KXMOpY0q1VhXDZCc2p2hSFPko5PL",
+	"MwjgAclIrSCC/nHvuGfL0TkqkUuI4H21ZAXJ0wpNKHIZPvTDlbZNsGq77ZiodJJABF+QB809SGhyrYyr",
+	"512vZ39irRidbkSepzKu3g3vjVZLK2Cf/iccQwT/hUuvEC6MQth2CVWtCZqYZM6upIuvdrUMGtwJ5tpI",
+	"pxNtOoB/WhxwFKLhgU7mOwO8MU5lWyxMBZZ7bNjmwHiaFsCHnfJU+6WOdAORHF25Xru8/cPk/aFEwVNN",
+	"8g8mayqpP+x+mdSWZk86aZvAA4tkza69KWSLQsLGwfiuwbqblQ/a52W4arTeOOvgLLU+1z/SlQ3e0zyv",
+	"uP0DD/Oqud+iitdhZ2l4ILoZrXJFC3Prp6u2v3tirP334Fmk9Xee3M/bR0LBtoevNdJbuJtJniYkZn7u",
+	"hvWJN5f1z93HbeGs/L+5GZWj8m8AAAD//w==",
 }
 
 // decodeSpec returns the embedded OpenAPI spec as raw JSON bytes,
