@@ -1,4 +1,4 @@
-package go_pkg
+package shared
 
 type DomainError struct {
 	Msg string
