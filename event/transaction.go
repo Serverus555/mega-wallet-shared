@@ -13,9 +13,8 @@ type Envelope struct {
 }
 
 type baseTransactionEvent struct {
-	TraceId string
-	UserId  uuid.UUID
-	Amount  string
+	UserId uuid.UUID
+	Amount string
 
 	Start time.Time
 	End   time.Time
