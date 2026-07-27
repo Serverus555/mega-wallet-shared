@@ -13,8 +13,9 @@ type Envelope struct {
 }
 
 type BaseTransactionEvent struct {
-	UserId uuid.UUID
-	Amount string
+	UserId   uuid.UUID
+	Currency string
+	Amount   string
 
 	Start time.Time
 	End   time.Time
@@ -23,19 +24,14 @@ type BaseTransactionEvent struct {
 
 type DepositEvent struct {
 	BaseTransactionEvent
-	Currency string
-	Amount   string
 }
 
 type WithdrawEvent struct {
 	BaseTransactionEvent
-	Currency string
-	Amount   string
 }
 
 type ExchangeEvent struct {
 	BaseTransactionEvent
-	FromCurrency     string
 	ToCurrency       string
 	FromExchangeRate string
 	ToExchangeRate   string
