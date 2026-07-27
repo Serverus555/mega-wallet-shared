@@ -12,7 +12,7 @@ type Envelope struct {
 	Event json.RawMessage
 }
 
-type baseTransactionEvent struct {
+type BaseTransactionEvent struct {
 	UserId uuid.UUID
 	Amount string
 
@@ -22,19 +22,19 @@ type baseTransactionEvent struct {
 }
 
 type DepositEvent struct {
-	baseTransactionEvent
+	BaseTransactionEvent
 	Currency string
 	Amount   string
 }
 
 type WithdrawEvent struct {
-	baseTransactionEvent
+	BaseTransactionEvent
 	Currency string
 	Amount   string
 }
 
 type ExchangeEvent struct {
-	baseTransactionEvent
+	BaseTransactionEvent
 	FromCurrency     string
 	ToCurrency       string
 	FromExchangeRate string
